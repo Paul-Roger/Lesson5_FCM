@@ -12,7 +12,7 @@
 1. пополнение счета
 при выборе этого пункта пользователю предлагается ввести сумму на сколько пополнить счет
 после того как пользователь вводит сумму она добавляется к счету
-снова попадаем в основное меню
+снова попадаем в основное меню. При выходе из программы счет сохраняется в файле
 
 2. покупка
 при выборе этого пункта пользователю предлагается ввести сумму покупки
@@ -21,6 +21,7 @@
 снимаем деньги со счета
 сохраняем покупку в историю
 выходим в основное меню
+При выходе из программы список покупок сохраняется в файле
 
 3. история покупок
 выводим историю покупок пользователя (название и сумму)
@@ -33,6 +34,31 @@
 
 Для реализации основного меню можно использовать пример ниже или написать свой
 """
+import json
+import pickle
+import os
+
+def save_acc(account, file_name):
+    with open(file_name, 'wb') as f:
+        pickle.dump(account,f)
+
+def restore_acc(file_name):
+    if os.path.exists(file_name):
+        with open(file_name, 'rb') as f:
+            return pickle.load(f)
+    else:
+        return 0
+
+def save_log(log, file_name):
+    with open(file_name, 'w') as f:
+        json.dump(log,f)
+
+def restore_log(file_name):
+    if os.path.exists(file_name):
+        with open(file_name, 'r') as f:
+            return json.load(f)
+    else:
+        return []
 
 def str_to_num(line):
     #конвертирует строку в число
@@ -85,6 +111,9 @@ def show_list(log):
 def conto():
     account = 0.0
     goods_list = list()
+#restore account data
+    account = restore_acc("conto.bin")
+    goods_list = restore_log("purch.log")
 
     while True:
         print('\n')
@@ -103,6 +132,8 @@ def conto():
         elif choice == '3':
             show_list(goods_list)
         elif choice == '4':
+            save_acc(account,"conto.bin")
+            save_log(goods_list, "purch.log")
             break
         else:
             print('Неверный пункт меню')

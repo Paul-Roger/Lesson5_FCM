@@ -1,6 +1,7 @@
 import shutil
 import os
 import sys
+import myconto
 
 """Тестируем функции из проекта Леонилдва Орлова"""
 
@@ -79,5 +80,11 @@ def test_separator():
     assert separator(5) == "*****"
     assert separator() == 30*"*"
 
+#естируем новыt функции дяя myconto
+def test_myconto():
+    myconto.save_acc(12.345, 'conto.bin')
+    assert myconto.restore_acc('conto.bin') == 12.345
 
-
+def test_log():
+    myconto.save_log([["AAA", 12.34], ["BBB", 43.21]], 'purch.log')
+    assert myconto.restore_log('purch.log') == [["AAA", 12.34], ["BBB", 43.21]]
