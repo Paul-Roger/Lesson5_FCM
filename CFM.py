@@ -19,7 +19,16 @@ import sys
 import myconto
 import victory
 
-menu_items = [("Cоздать папку", 1), ("Удалить (файл/папку)", 2), ("Копировать (файл/папку)", 3), ("Просмотр содержимого рабочей директории", 4), ("Посмотреть только папки", 5), ("Посмотреть только файлы", 6), ("Просмотр информации об операционной системе", 7), ("Создатель программы", 8), ("Играть в викторину", 9), ("Мой банковский счет", 10), ("Смена рабочей директории", 11), ("Выход", 12)]
+def scan_dir (mode = 0):  #получить список: 0 = файлов и пааок, 1 = только папок, 2 = только файлов
+    list = []
+    with os.scandir(".") as entries:
+        for entry in entries:
+            if (mode == 1 and entry.is_dir() or mode == 2 and entry.is_file() or mode == 0):
+                list.append(entry.name)
+    return list
+
+
+menu_items = [("Выход", 0), ("Cоздать папку", 1), ("Удалить (файл/папку)", 2), ("Копировать (файл/папку)", 3), ("Просмотр содержимого рабочей директории", 4), ("Посмотреть только папки", 5), ("Посмотреть только файлы", 6), ("Просмотр информации об операционной системе", 7), ("Создатель программы", 8), ("Играть в викторину", 9), ("Мой банковский счет", 10), ("Смена рабочей директории", 11), ("Вывод списка в файл", 12)]
 
 while True:
     print()
@@ -32,7 +41,7 @@ while True:
         print("Используйте число соотвутствующего пункта меню!\n")
         continue
     usr_num = int(usr_str)
-    if usr_num == 12: # Выход
+    if usr_num == 0: # Выход
         print("Astalavista, baby!")
         break
     if usr_num == 1:  #создать папку
@@ -61,23 +70,21 @@ while True:
     elif usr_num == 4:
         #просмотр содержимого рабочей директории
         print("Список файлов и папок в текущем каталоге:")
-        with os.scandir(".") as entries:
-            for entry in entries:
-                print(entry.name)
+        list = scan_dir()
+        for entry in list:
+            print(entry)
     elif usr_num == 5:
         #посмотреть только папки
         print("Список папок в текущем каталоге:")
-        with os.scandir(".") as entries:
-            for entry in entries:
-                if entry.is_dir():
-                    print(entry.name)
+        list = scan_dir(1)
+        for entry in list:
+            print(entry)
     elif usr_num == 6:
         #посмотреть только файлы
         print("Список файлов в текущем каталоге:")
-        with os.scandir(".") as entries:
-            for entry in entries:
-                if entry.is_file():
-                    print(entry.name)
+        list = scan_dir(2)
+        for entry in list:
+            print(entry)
     elif usr_num == 7:
         #просмотр информации об операционной системе
         print(sys.platform)
@@ -97,5 +104,21 @@ while True:
             os.chdir(usr_str)
         else:
             print("Такой каталог не найден")
+    elif usr_num == 12:
+        #свывод списка файлов и папок рабочей директории в файл
+        print("Список папок в текущем каталоге:")
+        with open('dir.txt', 'w') as f:
+            f.write('Files: ')
+            d_list = scan_dir(2)
+            for i in range (len(d_list)):
+                f.write(f'{d_list[i]}')
+                if i+1 != len(d_list):
+                    f.write(', ')
+            f.write('\nDirs: ')
+            d_list = scan_dir(1)
+            for i in range (len(d_list)):
+                f.write(f'{d_list[i]}')
+                if i+1 != len(d_list):
+                    f.write(', ')
     else:
         print("Такой пункт меню не существует!\n")
