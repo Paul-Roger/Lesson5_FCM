@@ -20,11 +20,8 @@ import myconto
 import victory
 
 def scan_dir (mode = 0):  #получить список: 0 = файлов и пааок, 1 = только папок, 2 = только файлов
-    list = []
     with os.scandir(".") as entries:
-        for entry in entries:
-            if (mode == 1 and entry.is_dir() or mode == 2 and entry.is_file() or mode == 0):
-                list.append(entry.name)
+        list = [entry.name for entry in entries if (mode == 1 and entry.is_dir() or mode == 2 and entry.is_file() or mode == 0)]
     return list
 
 
@@ -35,12 +32,11 @@ while True:
     for point in menu_items:
         print(point[1], point[0])
     usr_str = input("\nВыберите функцию > ")
-    if usr_str.lower() == "exit":
-        break
-    if not usr_str.isdigit():
+    try:
+        usr_num = int(usr_str)
+    except ValueError:
         print("Используйте число соотвутствующего пункта меню!\n")
         continue
-    usr_num = int(usr_str)
     if usr_num == 0: # Выход
         print("Astalavista, baby!")
         break
@@ -49,7 +45,7 @@ while True:
         if not usr_str.isalnum():
             print("Ошибка - Недопустимое имя для папки")
         elif os.path.exists(usr_str):
-                print("Папка с таким именем уже существует:")
+            print("Папка с таким именем уже существует:")
         else:
             os.mkdir(usr_str)
     elif usr_num == 2: #удалить(файл / папку)
@@ -71,20 +67,17 @@ while True:
         #просмотр содержимого рабочей директории
         print("Список файлов и папок в текущем каталоге:")
         list = scan_dir()
-        for entry in list:
-            print(entry)
+        print(*list, sep='\n')
     elif usr_num == 5:
         #посмотреть только папки
         print("Список папок в текущем каталоге:")
         list = scan_dir(1)
-        for entry in list:
-            print(entry)
+        print(*list, sep='\n')
     elif usr_num == 6:
         #посмотреть только файлы
         print("Список файлов в текущем каталоге:")
         list = scan_dir(2)
-        for entry in list:
-            print(entry)
+        print(*list, sep='\n')
     elif usr_num == 7:
         #просмотр информации об операционной системе
         print(sys.platform)
@@ -106,19 +99,11 @@ while True:
             print("Такой каталог не найден")
     elif usr_num == 12:
         #свывод списка файлов и папок рабочей директории в файл
-        print("Список папок в текущем каталоге:")
+        print("Список папок в текущем каталоге выводим в файл dir.txt:")
         with open('dir.txt', 'w') as f:
-            f.write('Files: ')
             d_list = scan_dir(2)
-            for i in range (len(d_list)):
-                f.write(f'{d_list[i]}')
-                if i+1 != len(d_list):
-                    f.write(', ')
-            f.write('\nDirs: ')
+            f.write("Files: " + ", ".join(d_list))
             d_list = scan_dir(1)
-            for i in range (len(d_list)):
-                f.write(f'{d_list[i]}')
-                if i+1 != len(d_list):
-                    f.write(', ')
+            f.write("\nDirs: " + ", ".join(d_list))
     else:
         print("Такой пункт меню не существует!\n")
